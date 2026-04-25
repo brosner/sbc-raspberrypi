@@ -1,16 +1,18 @@
 From c52b39d29da48ef44d9fc95f2211b4e53de0e5ed Mon Sep 17 00:00:00 2001
 From: appkins <13772502+appkins@users.noreply.github.com>
 Date: Mon, 16 Mar 2026 13:02:43 -0500
-Subject: [PATCH 15/15] rpi: defconfig: enable BCM2712 and EFI boot
+Subject: [PATCH 15/15] rpi: defconfig: enable EFI boot for Raspberry Pi 5
 
-Update rpi_arm64_defconfig to enable BCM2712 SoC support,
-RP1 peripherals, PCIe, NVMe, and EFI boot for Raspberry Pi 5.
+Update rpi_arm64_defconfig to enable EFI boot for Raspberry Pi 5.
+Strip BCM2712/RP1/PCIe/NVMe/USB driver Kconfigs to avoid DM probe
+hangs during early boot; SD card on Pi 5 uses BCM2712 ARASAN SDHCI
+which works without RP1.
 
 Link: https://github.com/sidero-community/u-boot
 Signed-off-by: appkins <13772502+appkins@users.noreply.github.com>
 ---
- configs/rpi_arm64_defconfig | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ configs/rpi_arm64_defconfig | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
 index 69e8e72c5d7..1851fe09627 100644
@@ -34,26 +36,10 @@ index 69e8e72c5d7..1851fe09627 100644
  CONFIG_SYS_PBSIZE=1049
  # CONFIG_DISPLAY_CPUINFO is not set
  # CONFIG_DISPLAY_BOARDINFO is not set
-@@ -65,3 +65,29 @@ CONFIG_VIDEO_BCM2835=y
+@@ -65,3 +65,15 @@ CONFIG_VIDEO_BCM2835=y
  CONFIG_CONSOLE_SCROLL_LINES=10
  CONFIG_PHYS_TO_BUS=y
  # CONFIG_HEXDUMP is not set
-+CONFIG_BCM2712=y
-+CONFIG_MFD_RP1=y
-+CONFIG_RP1_GPIO=y
-+CONFIG_RESET_BRCMSTB=y
-+CONFIG_RESET_BRCMSTB_RESCAL=y
-+CONFIG_CLK=y
-+CONFIG_SYS_PCI_64BIT=y
-+CONFIG_MACB=y
-+# Enable NVME
-+CONFIG_NVME_PCI=y
-+CONFIG_CMD_NVME=y
-+CONFIG_NVME=y
-+# USB mass storage support
-+CONFIG_CMD_USB_MASS_STORAGE=y
-+CONFIG_USB_DWC3=y
-+CONFIG_USB_XHCI_DWC3=y
 +# Boot config
 +CONFIG_BOOTSTD=y
 +CONFIG_BOOTMETH_DISTRO=n
@@ -64,6 +50,5 @@ index 69e8e72c5d7..1851fe09627 100644
 +CONFIG_PXE_UTILS=n
 +# Disable EFI bootmanager (reserves memory on 0x00080000 -> prevents continuing after being successful)
 +CONFIG_CMD_BOOTEFI_BOOTMGR=n
--- 
+--
 2.53.0
-
