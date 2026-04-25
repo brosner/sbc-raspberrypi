@@ -30,10 +30,10 @@ type rpiOptions struct {
 
 func (i *RpiInstaller) GetOptions(extra rpiOptions) (overlay.Options, error) {
 	return overlay.Options{
-		Name: "rpi_generic",
+		Name: "rpi_5",
 		KernelArgs: []string{
 			"console=tty0",
-			"console=ttyAMA0,115200",
+			"console=ttyAMA10,115200",
 			"sysctl.kernel.kexec_load_disabled=1",
 			"talos.dashboard.disabled=1",
 		},
@@ -41,12 +41,9 @@ func (i *RpiInstaller) GetOptions(extra rpiOptions) (overlay.Options, error) {
 }
 
 func (i *RpiInstaller) Install(options overlay.InstallOptions[rpiOptions]) error {
-	err := copy.Dir(filepath.Join(options.ArtifactsPath, "arm64/firmware/boot"), filepath.Join(options.MountPrefix, "/boot/EFI"))
-	if err != nil {
-		return err
-	}
-
-	err = copy.Dir(filepath.Join(options.ArtifactsPath, "dtb"), filepath.Join(options.MountPrefix, "/boot/EFI"))
+	// Pi 5 does not need raspberrypi-firmware; it loads firmware from EEPROM.
+	// Only install DTBs and U-Boot.
+	err := copy.Dir(filepath.Join(options.ArtifactsPath, "dtb"), filepath.Join(options.MountPrefix, "/boot/EFI"))
 	if err != nil {
 		return err
 	}
